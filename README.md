@@ -1,72 +1,374 @@
-# EVERSE Software Quality Pipelines
+# BioHackathon Europe 2026 · Research Software Quality
 
-![PyPI - Version](https://img.shields.io/pypi/v/resqui)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20553350-blue)](https://doi.org/10.5281/zenodo.20553350)
+Entry point for **[Project 8](https://github.com/elixir-europe/biohackathon-projects-2026/blob/main/8.md)** of the [BioHackathon Europe 2026](https://biohackathon-europe.org/): *Advancing Research Software Quality across ELIXIR: Sustainable, Reproducible, and Interoperable Life-Science Software*.
 
-The EVERSE Software Quality Pipelines provide
+The project reviews, maps and prioritises research software quality indicators that matter to ELIXIR and related initiatives, such as [EVERSE](https://everse.software/), [B1MGplus](https://b1mg-project.eu/) and [ELIXIR-STEERS](https://elixir-europe.org/about-us/how-funded/eu-projects/steers). We also turn those indicators into automated checks in [resqui](https://github.com/EVERSE-ResearchSoftware/QualityPipelines), the EVERSE quality pipeline.
 
-1) the command line tool `resqui` to check a configurable set of software quality indicators on research software via external plugins (tools); 
-2) GitHub Action to run the pipeline on a github repository.
+This repository collects the resources and instructions you need to contribute during the hackathon to the thread 1 of the project. This thread is focused on adding new tools and indicators to [`resqui`](https://github.com/EVERSE-ResearchSoftware/QualityPipelines).
 
-Please read and adhere to our contribution guidelines on  `CONTRIBUTING.md` and our [Code of Conduct](https://everse.software/network/code_of_conduct/). 
+**Co-leads:** Laura Portell-Silva, Shoaib Sufi, Styliani-Christina Fragkouli
 
-## Documentation
+## Contents
 
-### Quality Pipelines
+- [Resources](#resources)
+  - [Project](#project)
+  - [EVERSE](#everse)
+  - [resqui](#resqui)
+- [Project Tracks](#project-tracks)
+- [Key concepts](#key-concepts)
+  - [Measuring tools](#measuring-tools)
+  - [Software tiers](#software-tiers)
+- [Candidate tools and indicators](#candidate-tools-and-indicators)
+  - [Work already in progress](#work-already-in-progress)
+- [Contributing to resqui during the hackathon](#contributing-to-resqui-during-the-hackathon)
+- [Code of Conduct](#code-of-conduct)
 
-An overview on the quality pipelines is given below.
-The complete documentation of the quality pipelines are available at the project's [Github Pages](https://everse.software/QualityPipelines/), please read through those pages if you encounter issues and questions.
+## Resources
 
-1) `resqui`  can be installed - preferably within a Python virtual environment - with the requirements of `Docker` and `Python 3.9+`
+<!-- ### Zoom link
 
-- using pip:
+To join online please us [this](https://rediris.zoom.us/j/93810366052?pwd=bQpoUxa0lmu2YxH5Vtca9PnyaZ37Wy.1) link. -->
 
+### Project
+
+| Resource | Description |
+|---|---|
+| [Project page](https://github.com/elixir-europe/biohackathon-projects-2026/blob/main/8.md) | Official description of Project 8 in the BioHackathon projects repository. |
+| [Slack channel](https://biohackeu.slack.com/archives/C0BBMFB0XEY) | Main communication channel for the project (BioHackathon Europe Slack workspace). |
+
+### EVERSE
+
+| Resource | Description |
+|---|---|
+| [EVERSE indicators](https://everse.software/indicators/website/indicators.html) | Catalogue of measurable research software quality indicators. |
+| [RSQKit](https://everse.software/RSQKit/tasks) | Research Software Quality Kit: community best practices and guidelines. |
+| [Three-tier view](https://everse.software/RSQKit/three_tier_view) | Classification of research software into three tiers (analysis code, prototype tools, research software infrastructure). |
+| [TechRadar](https://everse.software/TechRadar/) | Catalogue of tools that measure or improve quality indicators. The full catalogue is also available as [JSON](https://everse.software/TechRadar/api/tools.json). |
+| [Tool selection criteria](https://github.com/EVERSE-ResearchSoftware/RSQKit/blob/main/TOOLS_SELECTION_CRITERIA.md) | Criteria for adding a tool to RSQKit or the TechRadar. |
+<!-- | [DashVERSE](https://www.dashverse.cloud/) | Dashboard to visualise quality assessments. |
+| [DashVERSE](https://github.com/EVERSE-ResearchSoftware/DashVERSE) | Dashboard to visualise quality assessments. | 
+TODO: the link to dashverse does not work, not sure if the github repo should be visible
+--> 
+
+### resqui
+
+| Resource | Description |
+|---|---|
+| [Repository](https://github.com/EVERSE-ResearchSoftware/QualityPipelines) | Source code of `resqui`, the EVERSE quality pipeline. Indicators are implemented as plugins. |
+| [Documentation](https://everse.software/QualityPipelines/) | User and developer documentation. |
+| [Open issues](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/issues) and [pull requests](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/pulls) | Check these before starting, so you don't duplicate work in progress. |
+
+<!-- TODO: add the resqui/TechRadar indicator tables here once they are published in the public Google Drive. -->
+
+## Project Tracks
+
+The project has two participation tracks, and you can join on site or remotely. No prior experience with software quality is needed for any of them.
+
+| Track | Focus | Experience | Coordinated |
+|---|---|---|---|
+| **1. Coding** (this repository) | Add new tools and indicators to `resqui` as plugins, turning quality indicators into automated checks. | Some coding experience (Python, and Docker for some tools) and familiarity with Git and GitHub (forks, branches, pull requests) help. | On site |
+| 2. Health and genomic data | Shape the indicators B1MGplus needs, including security and a new *software responsibility* dimension for medical software. | No coding experience needed. | On site |
+
+<!-- Workflows track removed, Shoaib can't run it:
+| 2. Workflows | Bring quality indicators to [WorkflowHub](https://workflowhub.eu/) and BioFAIR, using real workflows as test cases. | No coding experience needed. | Online |
+-->
+
+**This repository is mainly for Track 1.** The rest of this README explains how to pick a tool or indicator and contribute it to `resqui`. If you're interested in Track 2, join the [Slack channel](https://biohackeu.slack.com/archives/C0BBMFB0XEY) please. 
+<!-- TODO add were the info for the other tracks are -->
+
+## Key concepts
+
+- **Indicator:** a measurable property of research software quality, for example `software_has_license` or `has_ci-tests`. Indicators are defined in the [EVERSE indicators catalogue](https://everse.software/indicators/website/indicators.html), and each one has a unique identifier (its `@id`), a URI such as `https://w3id.org/everse/i/indicators/software_has_license`, which TechRadar and `resqui` use to refer to it.
+- **Tool:** an existing piece of software that can assess one or more indicators, for example [Gitleaks](https://everse.software/TechRadar/#/tool/gitleaks) or [OpenSSF Scorecard](https://github.com/ossf/scorecard). Tools are catalogued in the [TechRadar](https://everse.software/TechRadar/).
+- **Plugin:** the `resqui` code that wraps a tool, runs it on a repository and reports the result for each indicator it covers. Plugins run the tool either as a Python package (`PythonExecutor`) or as a Docker image (`DockerExecutor`).
+
+### Measuring tools
+
+In the TechRadar, a tool that assesses an indicator is linked to it with `measuresQualityIndicator`: you run the tool on a piece of software and it reports whether, or how well, the indicator is met. For example, the [FAIRsoft Evaluator](https://everse.software/TechRadar/#/tool/fairsoft-evaluator) reads a repository's metadata and reports whether it has a license, documentation or a citation.
+
+**Only measuring tools can become `resqui` plugins.**
+
+<!-- The TechRadar also links tools with `improvesQualityIndicator`: adopting the tool helps your software meet the indicator, but the tool doesn't evaluate anything. For example, Apptainer makes your software containerized, but it never inspects a repository or produces a score.
+Some tools do both (for example `pytest`), and some TechRadar entries are not consistently curated. If you find a mismatch, such as a measuring tool listed only under "improves", it's worth reporting to the TechRadar. -->
+
+### Software tiers
+
+RSQKit classifies research software into [three tiers](https://everse.software/RSQKit/three_tier_view): **analysis code**, **prototype tools** and **research software infrastructure**. How relevant an indicator is depends on the tier. Something that is nice to have for analysis code can be essential for research software infrastructure. `resqui` ships configuration files with the recommended indicators for [analysis code](https://raw.githubusercontent.com/EVERSE-ResearchSoftware/QualityPipelines/main/configurations/indicators_analysis_code.json), [prototype tools](https://raw.githubusercontent.com/EVERSE-ResearchSoftware/QualityPipelines/main/configurations/indicators_prototype_tools.json) and [research software infrastructure](https://raw.githubusercontent.com/EVERSE-ResearchSoftware/QualityPipelines/main/configurations/indicators_rs_infrastructure.json).
+
+EVERSE rates how relevant each indicator is for each tier: *crucial*, *recommended*, *good to have* or *not relevant*. The table below is taken from [Relevance of Indicators for RS Tiers](https://everse.software/indicators/website/rs_tiers.html) (accessed on 22 October 2026).
+
+<details>
+<summary>Relevance of indicators for each tier</summary>
+
+| Indicator | RS infrastructure | Prototype tools | Analysis code |
+|---|---|---|---|
+| [No leaked credentials](https://w3id.org/everse/i/indicators/no_leaked_credentials) | crucial | crucial | crucial |
+| [Software has license](https://w3id.org/everse/i/indicators/software_has_license) | crucial | crucial | crucial |
+| [Software makes use of version control](https://w3id.org/everse/i/indicators/version_control_use) | crucial | crucial | crucial |
+| [Software has dependency management solution](https://w3id.org/everse/i/indicators/dependency_management) | crucial | recommended | recommended |
+| [Software is listed in a registry](https://w3id.org/everse/i/indicators/listed_in_registry) | crucial | recommended | recommended |
+| [Software has persistent and unique identifier](https://w3id.org/everse/i/indicators/persistent_and_unique_identifier) | crucial | recommended | recommended |
+| [Has a measure of functional correctness](https://w3id.org/everse/i/indicators/functional_correctness) | crucial | recommended | good to have |
+| [All tests defined by the software component pass](https://w3id.org/everse/i/indicators/passed_tests_ok) | crucial | recommended | good to have |
+| [Software specifies requirements](https://w3id.org/everse/i/indicators/requirements_specified) | crucial | recommended | good to have |
+| [Software has documentation](https://w3id.org/everse/i/indicators/software_has_documentation) | crucial | recommended | good to have |
+| [Software follows versioning standards](https://w3id.org/everse/i/indicators/versioning_standards_use) | crucial | recommended | good to have |
+| [Software is archived in a scholarly repository](https://w3id.org/everse/i/indicators/archived_in_scholarly_repository) | crucial | good to have | good to have |
+| [Software has continuous integration tests](https://w3id.org/everse/i/indicators/has_ci-tests) | crucial | good to have | good to have |
+| [Software has no linting issues](https://w3id.org/everse/i/indicators/has_no_linting_issues) | crucial | good to have | good to have |
+| [Software has releases](https://w3id.org/everse/i/indicators/has_releases) | crucial | good to have | good to have |
+| [No critical vulnerabilities](https://w3id.org/everse/i/indicators/no_critical_vulnerability) | crucial | good to have | good to have |
+| [Software has ci/cd workflows in its repository](https://w3id.org/everse/i/indicators/repository_workflows) | crucial | good to have | good to have |
+| [Software uses citation](https://w3id.org/everse/i/indicators/software_has_citation) | crucial | good to have | good to have |
+| [Software has sufficient test coverage](https://w3id.org/everse/i/indicators/software_test_coverage) | crucial | good to have | good to have |
+| [Has static analysis for common vulnerabilities](https://w3id.org/everse/i/indicators/static_analysis_common_vulnerabilities) | crucial | good to have | good to have |
+| [Software has descriptive metadata](https://w3id.org/everse/i/indicators/descriptive_metadata) | crucial | good to have | not relevant |
+| [Software provides tests](https://w3id.org/everse/i/indicators/software_has_tests) | crucial | good to have | not relevant |
+| [Software provides issue tracking](https://w3id.org/everse/i/indicators/support_issue_tracking) | recommended | recommended | good to have |
+| [Coupling between objects follows community conventions](https://w3id.org/everse/i/indicators/coupling_between_objects_ok) | recommended | good to have | not relevant |
+| [Software is archived in Software Heritage](https://w3id.org/everse/i/indicators/archived_in_software_heritage) | recommended | good to have | good to have |
+| [Code smells follow community conventions](https://w3id.org/everse/i/indicators/code_smells_ok) | recommended | good to have | good to have |
+| [Software has up-to-date metadata](https://w3id.org/everse/i/indicators/metadata_is_up_to_date) | recommended | good to have | good to have |
+| [Responses to issues and/or pull requests are done within a defined timeframe](https://w3id.org/everse/i/indicators/response_timeframe_ok) | recommended | good to have | good to have |
+| [The project's repository includes a container build file](https://w3id.org/everse/i/indicators/software_is_containerized) | recommended | good to have | good to have |
+| [Software uses a tool for warnings or mistakes](https://w3id.org/everse/i/indicators/uses_tool_for_warnings_and_mistakes) | recommended | good to have | good to have |
+| [Code churn follows community conventions](https://w3id.org/everse/i/indicators/code_churn_ok) | recommended | good to have | not relevant |
+| [Code duplication follows community conventions](https://w3id.org/everse/i/indicators/code_duplication_ok) | recommended | good to have | not relevant |
+| [Project has active contributors beyond core maintainers](https://w3id.org/everse/i/indicators/has_active_contributors) | recommended | good to have | not relevant |
+| [Software is published as a downloadable package](https://w3id.org/everse/i/indicators/has_published_package) | recommended | not relevant | not relevant |
+| [Software repository has contribution guidelines](https://w3id.org/everse/i/indicators/has_contribution_guidelines) | good to have | recommended | good to have |
+| [Project has active communication channels](https://w3id.org/everse/i/indicators/has_active_communication_channels) | good to have | good to have | good to have |
+| [Project repository is active](https://w3id.org/everse/i/indicators/project_is_active) | good to have | good to have | good to have |
+| [Software uses an appropriate license for different file types](https://w3id.org/everse/i/indicators/software_has_license_for_file_types) | good to have | good to have | good to have |
+| [The documentation coverage for the codebase follows community conventions](https://w3id.org/everse/i/indicators/code_documentation_coverage_ok) | good to have | good to have | not relevant |
+| [Cyclomatic complexity follows community conventions](https://w3id.org/everse/i/indicators/cyclomatic_complexity_ok) | good to have | good to have | not relevant |
+| [Project repository has no binary artifacts](https://w3id.org/everse/i/indicators/has_no_binary_artifacts) | good to have | good to have | not relevant |
+| [Cohesion among methods/functions of a module follows community conventions](https://w3id.org/everse/i/indicators/internal_cohesion_ok) | good to have | good to have | not relevant |
+| [Number of lines of code follows community standards or expectations](https://w3id.org/everse/i/indicators/lines_of_code_ok) | good to have | good to have | not relevant |
+| [Maintainability index follows community conventions](https://w3id.org/everse/i/indicators/maintainability_index_ok) | good to have | good to have | not relevant |
+| [CodeMeta completeness](https://w3id.org/everse/i/indicators/codemeta_completeness) | good to have | not relevant | not relevant |
+| [Software requires human code review](https://w3id.org/everse/i/indicators/human_code_review_requirement) | good to have | not relevant | not relevant |
+| [Software uses fuzzing](https://w3id.org/everse/i/indicators/uses_fuzzing) | good to have | not relevant | not relevant |
+
+</details>
+
+## Candidate tools and indicators
+
+The main target of Track 1 is **TechRadar tools that measure indicators not yet covered by `resqui`**. We compared the [TechRadar catalogue](https://everse.software/TechRadar/#/) with the plugins currently in `resqui` to build a list of candidates, and we use the [relevance of each indicator](#software-tiers) for each tier to prioritise them.
+
+This summary of this analysis can be found here this can be found  the tools and  [candidate tools and indicators spreadsheet](https://docs.google.com/spreadsheets/d/1sZpNknO0m_BJpyFusTtPjwqF0dwoULMGv_Ii139OqfA/edit?usp=sharing) collects this analysis:
+
+<!-- TODO: Add how to pick a given tool in the sheet or in an ad-hoc github project -->
+
+### Work already in progress
+
+Before picking a candidate, check that nobody is already working on it. These open `resqui` pull requests add new plugins or indicators:
+
+| PR | Tool | Indicator |
+|---|---|---|
+| [#144](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/pull/144) | interrogate | `code_documentation_coverage_ok` |
+| [#143](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/pull/143) | HowFairIs | `software_has_license` for file types |
+| [#139](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/pull/139) | rsmetacheck | `metadata_is_up_to_date` |
+| [#137](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/pull/137) | pylint | `code_smells_ok` |
+| [#134](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/pull/134) | repowise | `code_churn_ok` |
+
+See also the issue [#51 "list of next plugins"](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/issues/51), where the `resqui` team tracks which plugins to implement next.
+
+
+<!-- TODO: confirm with Dmitry and Jose Maria whether these libraries can be added to resqui. -->
+
+<!-- ### Proposed example cases -->
+
+<!-- Two libraries that detect **license inconsistencies** in software, one for Java and one for Python, are being considered as example cases for the hackathon. The Java one would run as a Docker image with a wrapper script, and the Python one as a Python package. NOT MAINTAINED FOR TWO YEARS, WON'T DO-->
+
+## Contributing to resqui during the hackathon
+
+The steps below use as example [Semgrep](https://semgrep.dev/), a static analysis tool, to check the indicator [`no_critical_vulnerability`](https://w3id.org/everse/i/indicators/no_critical_vulnerability) (*No critical vulnerabilities*, crucial for research software infrastructure). Replace Semgrep and the indicator with the tool and indicator you pick.
+
+During the hackathon we don't work directly on the official `resqui` repository. Instead, we use a hackathon copy of it (fork), [inab/ELIXIR-BH2026-RESQUI](https://github.com/inab/ELIXIR-BH2026-RESQUI), kept in sync with the official `main`. It has one branch per tool being worked on:
+
+| Branch | Tool |
+|---|---|
+| [`semgrep`](https://github.com/inab/ELIXIR-BH2026-RESQUI/tree/semgrep) | [Semgrep](https://semgrep.dev/) |
+| [`scancode-toolkit`](https://github.com/inab/ELIXIR-BH2026-RESQUI/tree/scancode-toolkit) | [ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit) |
+
+### 1. Pick and claim a candidate
+
+1. Choose a tool and indicator from the [candidates](#candidate-tools-and-indicators), and check it's not in the [work already in progress](#work-already-in-progress).
+   *Example:* `no_critical_vulnerability` is already measured by the OpenSSF Scorecard plugin, which looks for known vulnerabilities in the project's dependencies. Semgrep adds a different approach: it scans the project's own source code for vulnerable patterns. An indicator can be measured by more than one tool, so this is not duplicated work.
+2. Check that the indicator is in the [EVERSE indicators catalogue](https://everse.software/indicators/website/indicators.html) and note its exact identifier and `@id`, as you'll need them for the issue. `resqui` only accepts indicators defined there. If yours is missing, it has to be proposed to EVERSE first.
+   *Example:* the identifier is `no_critical_vulnerability`, and its `@id` is `https://w3id.org/everse/i/indicators/no_critical_vulnerability`.
+3. Open an issue in the [hackathon repository](https://github.com/inab/ELIXIR-BH2026-RESQUI/issues) with the [plugin or indicator request](https://github.com/inab/ELIXIR-BH2026-RESQUI/issues/new?template=plugin_or_indicator_request.yml) template, or comment on an existing one, so others know you're working on it. If your tool doesn't have a branch yet, ask in the [Slack channel](https://biohackeu.slack.com/archives/C0BBMFB0XEY) to have one created.
+   *Example:* "[Add a Semgrep plugin for `no_critical_vulnerability`](https://github.com/inab/ELIXIR-BH2026-RESQUI/issues/1)".
+
+
+### 2. Clone and set up `resqui`
+
+You work directly on the branch of your tool in the hackathon repository, without forking it. To push to it you need write access: ask in the [Slack channel](https://biohackeu.slack.com/archives/C0BBMFB0XEY), giving your GitHub username. Then clone the repository and switch to the branch of your tool:
+
+```bash
+git clone git@github.com:inab/ELIXIR-BH2026-RESQUI.git
+cd ELIXIR-BH2026-RESQUI
+git checkout semgrep
 ```
-pip install resqui
+
+If several people work on the same tool, pull often (`git pull origin semgrep`) to pick up each other's changes.
+
+Create a virtual environment, install `resqui` in development mode and run the tests, as described in the [contributing guidelines](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/blob/main/CONTRIBUTING.md#local-setup) (Python 3.9+, and Docker for plugins that use Docker images). This environment is needed to run and test your plugin in [step 4](#4-check-it-works). Activate it again in every new terminal with `source venv/bin/activate`.
+
+```bash
+make install-dev          # creates venv/ and installs resqui with dev dependencies
+source venv/bin/activate  # activates the environment
+make test                 # checks the setup works before you change anything
 ```
 
-- or from source:
 
+### 3. Write the plugin
+
+The [Add an Indicator Plugin](https://everse.software/QualityPipelines/how-to/add-a-plugin/) guide covers the details. Every plugin has the same structure, the only thing that changes is how it runs the tool.
+
+**What every plugin has**
+
+1. A file named after the tool (for example `src/resqui/plugins/semgrep.py`) with a class that subclasses `IndicatorPlugin`.
+2. The attributes `name`, `version`, `id` (the tool's TechRadar `@id`) and `indicators` (the EVERSE indicator identifiers it checks).
+3. One method per indicator, named after the indicator, that runs the tool and returns a `CheckResult`.
+
+**How it runs the tool**
+
+In `__init__`, create an executor that matches how the tool is distributed:
+
+| Tool is distributed as | Executor | How you call it |
+|---|---|---|
+| [A Python package](https://everse.software/QualityPipelines/how-to/add-a-plugin/#using-pythonexecutor) | `PythonExecutor(packages=["<package>==<version>"])` | `self.executor.execute("<python code>")` |
+| [A Docker image, or needs other languages or system dependencies](https://everse.software/QualityPipelines/how-to/add-a-plugin/#using-dockerexecutor) | `DockerExecutor("<image>:<tag>")` | `self.executor.run([<arguments>])` |
+
+**Register and test it**
+
+1. Import the plugin in [`src/resqui/plugins/__init__.py`](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/blob/main/src/resqui/plugins/__init__.py).
+2. Add the indicator to a configuration file in [`configurations/`](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/tree/main/configurations).
+3. Add tests in [`tests/`](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/tree/main/tests) and document the plugin in [`docs/explanation/plugins.md`](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/blob/main/docs/explanation/plugins.md).
+
+
+### 4. Check it works
+
+```bash
+resqui indicators                                   # your plugin and indicators (e.g. no_critical_vulnerability) should be listed
+resqui -c <your-config>.json -u <repo-url> -t $GITHUB_TOKEN -o test.json
+make test
 ```
-git clone https://github.com/EVERSE-ResearchSoftware/QualityPipelines.git
-cd QualityPipelines
-pip install .
+
+
+### 5. Push your changes
+
+Commit your changes, referencing the issue you opened in step 1 in the commit message (e.g. `Add Semgrep plugin (#1)`), and push them to the branch of your tool (never to `main`). Pull first so you have your teammates' latest changes:
+
+```bash
+git pull origin semgrep
+git push origin semgrep
 ```
-and can be executed with these options:
 
-```
-$ resqui -h
-Usage:
-    resqui [options]
-    resqui indicators
+Follow the [contributing guidelines](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/blob/main/CONTRIBUTING.md).
 
-Options:
-    -u <repository_url>   URL of the repository to be analyzed (GitHub URLs, Zenodo DOIs and URLs accepted). If omitted, resqui reads the remote repository URL from the current working directory's `.git` metadata.
-    -c <config_file>      Path to the configuration file.
-    -o <output_file>       Path to the JSON output file [default: resqui_summary.json].
-    --md <markdown_report> Path to a Markdown report to also generate from the JSON output.
-    -t <github_token>     GitHub API token.
-    -d <dashverse_token>  DashVerse API token.
-    -b <branch>           The Git branch to be checked.
-    -v                    Verbose output.
-    --version             Show the version of the script.
-    --help                Show this help message.
- ```
+Once a plugin is finished in the hackathon repository, it can be proposed to the official [`resqui` repository](https://github.com/EVERSE-ResearchSoftware/QualityPipelines).
+
+<!--
+TODO: Should we maybe put the comment below as a first thing to do?
+??? If the tool is not in the TechRadar yet, it also needs to be registered there. The plugin identifies the tool by its TechRadar `@id` (the plugin's `id` attribute), so without a TechRadar entry the results of the plugin can't be pushed to the TechRadar. This is the case of Semgrep, the tool used as an example above. Ask in the [Slack channel](https://biohackeu.slack.com/archives/C0BBMFB0XEY) how to do it.
+-->
 
 
-2) The GitHub Action to include in CI/CDs pipeline is available in [this repository](https://github.com/EVERSE-ResearchSoftware/resqui-github-action).
+<!--
+### `resqui` documentation
 
-### EVERSE Services
+- [Add an Indicator Plugin](https://everse.software/QualityPipelines/how-to/add-a-plugin/)
+- [Plugins and the indicators they cover](https://everse.software/QualityPipelines/explanation/plugins/)
+- [Custom configurations](https://everse.software/QualityPipelines/how-to/custom-configuration/)
+- [Contributing guidelines](https://github.com/EVERSE-ResearchSoftware/QualityPipelines/blob/main/CONTRIBUTING.md)
 
-EVERSE provides a set of services to assess and improve the quality of research software, visit the [EVERSE homepage](https://everse.software) for more information.
+-->
 
-A simplified workflow to improve the software quality is: 
-Find the practices on `RSQKit` (1), get an overview on tools and services to measure and improve the quality on the `TechRadar` (2), run an assessment on your own or your groups software via resqui (3) and display the results on `DashVERSE` (4), assess and repeat from (1).
+## Code of Conduct
 
-More information the services can be found at:
+The BioHackathon follows the [ELIXIR Code of Conduct](https://elixir-europe.org/events/code-of-conduct). It applies to both in-person and virtual interactions in this project. See the [BioHackathon registration page](https://biohackathon-europe.org/attend/registration#code-of-conduct) for details.
 
-1) Research Software Quality Kit - [RSQKit](https://everse.software/services/rsqkit/)
-2) Technology Radar - [TechRadar](https://everse.software/services/techradar/)
-3) Quality Pipelines - `resqui` which is this project
-4) Software Quality Dashboards - [DashVERSE](https://everse.software/services/dashverse/)
+<!-- TODO
+- [?] Create table that links the indicators with the max value of priority with the missing indicators in techradar. 
+   - [x] Could the link to the google sheets be enough?
+ 
+- [ ] Keep updating index
 
+- [ ] When I was working with resqui on my computer I saw this, as the image is not there resqui does not work!!! In the tutorial this is not relevant because we will use the resqui modified from the user's fork that should have the fix.
+   > [!TIP]
+   > Always work from the `main` branch of the repository rather than the release on PyPI. The PyPI version may pull some Docker images (such as OpenSSF Scorecard) from registries that are no longer publicly accessible.
+
+- [ ] more todos
+
+- [ ] Create an issue in the resqui repo:
+
+   ```markdown
+   Title: bug: "Local setup" in CONTRIBUTING.md leaves the venv empty (make install-dev does nothing)
+
+
+   ### Where does the failure happen?
+
+   Test or CI workflow (local development setup)
+
+   ### Exact command or workflow step
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   make install-dev
+   ```
+
+   ### What did you expect to happen?
+
+   Following the "Local setup" steps in `CONTRIBUTING.md` should install `resqui` with its dev dependencies into `venv/`, so that `make test` and `resqui` work afterwards.
+
+   ### What happened instead?
+
+   ```shell
+   $ python3 -m venv venv
+   $ source venv/bin/activate
+   (venv) $ make install-dev
+   make: Nothing to be done for 'install-dev'.
+   ```
+
+   Nothing is installed: `resqui` and `coverage` are missing from the venv, so `make test` and `resqui` fail.
+
+   The cause is that `install-dev` depends only on the file `venv/bin/activate`:
+
+   ```make
+   $(VENV)/bin/activate: pyproject.toml
+      python3 -m venv $(VENV)
+      $(PIP) install -e ".[dev,docs]"
+      touch $(VENV)/bin/activate
+   ```
+
+   Running `python3 -m venv venv` by hand, as `CONTRIBUTING.md` says, creates `venv/bin/activate`, which is newer than `pyproject.toml`. `make` treats the target as up to date and skips the `pip install`.
+
+   ### Possible fixes
+
+   Any of these would work:
+
+   1. Change `CONTRIBUTING.md` to let `make` create the venv:
+      ```bash
+      make install-dev
+      source venv/bin/activate
+      ```
+   2. Use a marker file as the target instead of `venv/bin/activate` (for example `$(VENV)/.installed`, touched after `pip install`), so a pre-existing venv still gets the dependencies installed.
+   3. Make `install-dev` always run `$(PIP) install -e ".[dev,docs]"`.
+
+   ### Repository being assessed
+
+   N/A (setup issue)
+
+   ### Configuration file
+
+   N/A (failure happens before running `resqui`)
+
+   ### How did you run it?
+
+   Local Python environment
+   ```
+ -->
