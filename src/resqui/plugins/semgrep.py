@@ -9,7 +9,12 @@ from resqui.executors import DockerExecutor
 from resqui.core import CheckResult
 from resqui.workspace import create_workspace
 
-SOFTWARE_APPLICATION_ID = "https://w3id.org/everse/tools/semgrep"
+
+# Semgrep is not listed in the EVERSE TechRadar yet, so there is no valid @id.
+# Set it to "https://w3id.org/everse/tools/semgrep" once the TechRadar entry exists.
+# here https://github.com/EVERSE-ResearchSoftware/TechRadar/issues/322 is one of the suggested tools
+SOFTWARE_APPLICATION_ID = None
+# SOFTWARE_APPLICATION_ID = "https://w3id.org/everse/tools/semgrep"
 SOFTWARE_APPLICATION_VERSION = "1.183.0"
 SOFTWARE_APPLICATION_NAME = "Semgrep"
 
@@ -56,6 +61,15 @@ class Semgrep(IndicatorPlugin):
                 print(f"Error cloning {url}: {e}")
                 raise
 
+            if commit_hash:
+                subprocess.run(
+                    ["git", "checkout", commit_hash],
+                    check=True,
+                    cwd=workspace.local_path,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+
             plugin_path = workspace.container_path("/semgrep")
             report_path = f"{plugin_path}/{report_fname}"
 
@@ -64,18 +78,36 @@ class Semgrep(IndicatorPlugin):
 
             p = self.executor.run(["semgrep", "scan", "--json", f"--json-output={report_path}", plugin_path], run_args=run_args)
 
+
+            if p.returncode != 0:
+                raise subprocess.CalledProcessError(
+                    p.returncode,
+                    p.args,
+                    output=p.stdout,
+                    stderr=p.stderr,
+                )
+            
             with open(os.path.join(workspace.local_path, report_fname)) as f:
                 report = json.load(f)
 
             evidence = ""
+            critical_count = 0
             results = report.get('results', [])
             for result in results:
                 extra = result.get('extra')
                 if extra and extra.get('severity') == 'CRITICAL':
+                    critical_count += 1
                     evidence = evidence + extra.get('message', '') + "\n"
 
-            check_res.success = not evidence
-            check_res.output = str(not evidence).lower()
-            check_res.evidence = evidence
+            ok = critical_count == 0
+            check_res.success = ok
+            check_res.output = str(ok).lower()
+            check_res.evidence = (
+                f"{critical_count} critical vulnerabilities found "
+                f"(threshold: 0; the check passes only when none are found). "
+                f"{evidence}".strip()
+            )
+            check_res.raw_value = str(critical_count)
+            check_res.threshold = "0"
 
         return check_res
