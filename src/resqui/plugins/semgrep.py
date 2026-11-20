@@ -10,10 +10,10 @@ from resqui.core import CheckResult
 from resqui.workspace import create_workspace
 
 
-# Semgrep is not listed in the EVERSE TechRadar yet, so there is no valid @id.
+# Semgrep is not listed in the EVERSE TechRadar yet, there is no valid @id so use its GitHub repository as the @id
 # Set it to "https://w3id.org/everse/tools/semgrep" once the TechRadar entry exists.
 # here https://github.com/EVERSE-ResearchSoftware/TechRadar/issues/322 is one of the suggested tools
-SOFTWARE_APPLICATION_ID = None
+SOFTWARE_APPLICATION_ID = "https://github.com/semgrep/semgrep"
 # SOFTWARE_APPLICATION_ID = "https://w3id.org/everse/tools/semgrep"
 SOFTWARE_APPLICATION_VERSION = "1.183.0"
 SOFTWARE_APPLICATION_NAME = "Semgrep"
